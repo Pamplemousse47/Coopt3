@@ -31,8 +31,11 @@ class MainActivity : AppCompatActivity() {
         val resultTextView: TextView = binding.txtHoldApi
         //Image items
         val imageView:  ImageView = binding.imgRecieved
+        // Button items
+        val btnSearch: Button = binding.btnSearchForImage
+        val btnAdd: Button = binding.btnSave
 
-        binding.btnSearchForImage.setOnClickListener()
+        btnSearch.setOnClickListener()
         {
             //Declare a EditText variable to hold the user input
             val userInput: EditText = binding.txtInputISBN
@@ -57,14 +60,11 @@ class MainActivity : AppCompatActivity() {
                     //Gets an array from json in the key called "covers"
                     val responseJSON: JSONArray = response.getJSONArray("covers")
                     //Stores the cover ID
-                    val imageId: String
-
                     //If it has a cover sends image to the imageView
                     //Using negative causes a failure
-                    imageId = responseJSON.getString(0)
+                    val imageId: String = responseJSON.getString(0)
 
-
-                    //Loads recieved image
+                    //Loads received image
                     // With thumbnail url change the jpg if testing for errors
                     Glide.with(imageView)
                         .load("https://covers.openlibrary.org/b/id/${imageId}-L.jpg")
@@ -73,7 +73,10 @@ class MainActivity : AppCompatActivity() {
                     //Display book cover ID
                     resultTextView.text = response.getString("title")
                 },//If an error occurs in fetching the data
-                { resultTextView.text = "Failed to fetch the api" })
+                {
+                    resultTextView.text = "Failed to fetch the api"
+                    toast.show()
+                })
 
             // Add the request to the RequestQueue.
             queue.add(jsonObjectRequest)

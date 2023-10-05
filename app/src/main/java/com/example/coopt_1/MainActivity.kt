@@ -16,6 +16,8 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.coopt_1.databinding.ActivityMainBinding
 import org.json.JSONArray
+import android.content.Intent
+import android.view.View
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +34,18 @@ class MainActivity : AppCompatActivity() {
         //Image items
         val imageView:  ImageView = binding.imgRecieved
         // Button items
+        val btnSaved: Button = binding.btnSaved
         val btnSearch: Button = binding.btnSearchForImage
         val btnAdd: Button = binding.btnSave
+
+        // Initially sets the save button to invisible until a successful response is handled.
+        btnAdd.visibility = View.INVISIBLE
+
+        // Switches the view to the Saved Titles View
+        btnSaved.setOnClickListener() {
+            val switch = Intent(this, SavedViewActivity::class.java)
+            startActivity(switch)
+        }
 
         btnSearch.setOnClickListener()
         {
@@ -72,9 +84,11 @@ class MainActivity : AppCompatActivity() {
                         .into(imageView)
                     //Display book cover ID
                     resultTextView.text = response.getString("title")
+                    btnAdd.visibility = View.VISIBLE
                 },//If an error occurs in fetching the data
                 {
                     resultTextView.text = "Failed to fetch the api"
+                    btnAdd.visibility = View.INVISIBLE
                     toast.show()
                 })
 

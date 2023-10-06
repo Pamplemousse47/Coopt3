@@ -18,9 +18,17 @@ import com.example.coopt_1.databinding.ActivityMainBinding
 import org.json.JSONArray
 import android.content.Intent
 import android.view.View
+import androidx.room.Room
 
 
 class MainActivity : AppCompatActivity() {
+
+    private val db = Room.databaseBuilder(
+        applicationContext,
+        BookDatabase::class.java, "books"
+    ).build()
+    private val bookDao = db.bookDao()
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +102,16 @@ class MainActivity : AppCompatActivity() {
 
             // Add the request to the RequestQueue.
             queue.add(jsonObjectRequest)
+        }
+
+        btnAdd.setOnClickListener()
+        {
+            val userInput: EditText = binding.txtInputISBN
+            val newBook = Book(isbn = "${userInput.text}")
+            bookDao.insertBook(newBook)
+
+            val toast = Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT)
+            toast.show()
         }
     }
 }

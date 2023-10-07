@@ -16,23 +16,46 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.coopt_1.databinding.ActivityMainBinding
 import org.json.JSONArray
+import android.content.Intent
+import android.view.View
+import androidx.room.Room
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var db: BookDatabase
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        db = BookDatabase.getInstance(this)
 
         //Setting up Volley new request
         val queue = Volley.newRequestQueue(this)
         val resultTextView: TextView = binding.txtHoldApi
         //Image items
         val imageView:  ImageView = binding.imgRecieved
+        // Button items
+        val btnSaved: Button = binding.btnSaved
+        val btnSearch: Button = binding.btnSearchForImage
+        val btnAdd: Button = binding.btnSave
 
-        binding.btnSearchForImage.setOnClickListener()
+        // Initially sets the save button to invisible until a successful response is handled.
+        btnAdd.visibility = View.INVISIBLE
+
+        // Switches the view to the Saved Titles View
+        btnSaved.setOnClickListener() {
+            val switch = Intent(this, SavedViewActivity::class.java)
+            startActivity(switch)
+            finish()
+        }
+
+        btnSearch.setOnClickListener()
         {
             //Declare a EditText variable to hold the user input
             val userInput: EditText = binding.txtInputISBN
@@ -57,14 +80,11 @@ class MainActivity : AppCompatActivity() {
                     //Gets an array from json in the key called "covers"
                     val responseJSON: JSONArray = response.getJSONArray("covers")
                     //Stores the cover ID
-                    val imageId: String
-
                     //If it has a cover sends image to the imageView
                     //Using negative causes a failure
-                    imageId = responseJSON.getString(0)
+                    val imageId: String = responseJSON.getString(0)
 
-
-                    //Loads recieved image
+                    //Loads received image
                     // With thumbnail url change the jpg if testing for errors
                     Glide.with(imageView)
                         .load("https://covers.openlibrary.org/b/id/${imageId}-L.jpg")
@@ -72,11 +92,31 @@ class MainActivity : AppCompatActivity() {
                         .into(imageView)
                     //Display book cover ID
                     resultTextView.text = response.getString("title")
+                    btnAdd.visibility = View.VISIBLE
                 },//If an error occurs in fetching the data
-                { resultTextView.text = "Failed to fetch the api" })
+                {
+                    resultTextView.text = "Failed to fetch the api"
+                    btnAdd.visibility = View.INVISIBLE
+                    toast.show()
+                })
 
             // Add the request to the RequestQueue.
             queue.add(jsonObjectRequest)
+        }
+
+        btnAdd.setOnClickListener()
+        {
+            val bookDao = db.bookDao()
+            val books: List<Book> = bookDao.getAll()
+            var size = books.size + 1
+            val userInput: EditText = binding.txtInputISBN
+            val newBook = Book(uid = size,isbn = "${userInput.text}")
+            lifecycleScope.launch {
+                bookDao.insertBook(newBook)
+            }
+
+            val toast = Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT)
+            toast.show()
         }
     }
 }

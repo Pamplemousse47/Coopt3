@@ -19,15 +19,13 @@ import org.json.JSONArray
 import android.content.Intent
 import android.view.View
 import androidx.room.Room
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val db = Room.databaseBuilder(
-        applicationContext,
-        BookDatabase::class.java, "books"
-    ).build()
-    private val bookDao = db.bookDao()
+    private lateinit var db: BookDatabase
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        db = BookDatabase.getInstance(this)
 
         //Setting up Volley new request
         val queue = Volley.newRequestQueue(this)
@@ -53,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         btnSaved.setOnClickListener() {
             val switch = Intent(this, SavedViewActivity::class.java)
             startActivity(switch)
+            finish()
         }
 
         btnSearch.setOnClickListener()
@@ -106,9 +106,14 @@ class MainActivity : AppCompatActivity() {
 
         btnAdd.setOnClickListener()
         {
+            val bookDao = db.bookDao()
+            val books: List<Book> = bookDao.getAll()
+            var size = books.size + 1
             val userInput: EditText = binding.txtInputISBN
-            val newBook = Book(isbn = "${userInput.text}")
-            bookDao.insertBook(newBook)
+            val newBook = Book(uid = size,isbn = "${userInput.text}")
+            lifecycleScope.launch {
+                bookDao.insertBook(newBook)
+            }
 
             val toast = Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT)
             toast.show()

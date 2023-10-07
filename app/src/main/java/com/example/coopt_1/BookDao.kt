@@ -1,14 +1,14 @@
 package com.example.coopt_1
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Upsert
 
 @Dao
 interface BookDao {
     @Query("SELECT * FROM book")
-    fun getBooks(): List<Book>
+    fun getAll(): List<Book>
 
-    @Upsert
-    fun insertBook(vararg book: Book)
+    @Insert(entity = Book::class)
+    fun insertBook(book: Book)
 }

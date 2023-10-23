@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
+        //Searches for a book
         btnSearch.setOnClickListener()
         {
             //Declare a EditText variable to hold the user input
@@ -104,19 +105,35 @@ class MainActivity : AppCompatActivity() {
             queue.add(jsonObjectRequest)
         }
 
+        //Adds the book to the database
         btnAdd.setOnClickListener()
         {
-            val bookDao = db.bookDao()
-            val books: List<Book> = bookDao.getAll()
-            var size = books.size + 1
+            //User text
             val userInput: EditText = binding.txtInputISBN
-            val newBook = Book(uid = size,isbn = "${userInput.text}")
-            lifecycleScope.launch {
-                bookDao.insertBook(newBook)
+
+            val bookDao = db.bookDao()
+
+            //Checks if the book already exists
+            if(!bookDao.doesBookExist(isbn_recieved = "${userInput.text}"))
+            {
+                val books: List<Book> = bookDao.getAll()
+                var size = books.size + 1
+
+                val newBook = Book(uid = size,isbn = "${userInput.text}")
+                lifecycleScope.launch {
+                    bookDao.insertBook(newBook)
+                }
+
+                val toast = Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT)
+                toast.show()
+            }
+            else
+            {
+                //Already existing object
+                val toast = Toast.makeText(this, "Book Already Saved!", Toast.LENGTH_SHORT)
+                toast.show()
             }
 
-            val toast = Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT)
-            toast.show()
         }
     }
 }

@@ -26,8 +26,10 @@ class SavedViewActivity : AppCompatActivity() {
         val binding = SavedViewMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //Grabs our database instance
         db = BookDatabase.getInstance(this)
 
+        val btnDelete: Button = binding.btnDelete
         val btnSaved: Button = binding.btnSaved
         val btnPrev: Button = binding.btnPrev
         val btnNext: Button = binding.btnNext
@@ -36,36 +38,63 @@ class SavedViewActivity : AppCompatActivity() {
         val txtTitle: TextView = binding.txtTitle
 
         val bookDao = db.bookDao()
+
+        //Retrieves all our books in the database
         val books: List<Book> = bookDao.getAll()
 
         var index = 0
-
+        //Determines if we have any books
         if (books.isEmpty())
         {
+            //If no books are present
             txtTitle.text = "No Saved Books"
+            //Changes visiblity of buttons.
             btnPrev.visibility = View.INVISIBLE
             btnNext.visibility = View.INVISIBLE
         }
         else
         {
+            //If at least 1 book is present
+
+            //Retrieves current book
             val current = books.get(index)
+            //Get details of book
             getBookDetails(current, imgResponse, txtTitle)
+            //Determines the books position
             checkIndex(index, (books.size - 1), btnPrev, btnNext)
         }
-
+        //Switches to main activity
         btnSaved.setOnClickListener() {
             val switch = Intent(this, MainActivity::class.java)
             startActivity(switch)
             finish()
         }
 
+        //Delete button clears the whole database.
+        btnDelete.setOnClickListener() {
+            //Checks if any books are present
+            if(!books.isEmpty())
+            {
+                val toast = Toast.makeText(this, "Entry Deleted", Toast.LENGTH_SHORT)
+                toast.show()
+                bookDao.delete(books.get(index))
+                recreate();
+            }
+            else
+            {
+                val toast = Toast.makeText(this, "No Books to Delete", Toast.LENGTH_SHORT)
+                toast.show()
+            }
+
+        }
+        //Button to move between entries
         btnPrev.setOnClickListener() {
             index--
             val current = books.get(index)
             getBookDetails(current, imgResponse, txtTitle)
             checkIndex(index, (books.size - 1), btnPrev, btnNext)
         }
-
+        //Button to move between entries
         btnNext.setOnClickListener() {
             index++
             val current = books.get(index)
@@ -74,6 +103,7 @@ class SavedViewActivity : AppCompatActivity() {
         }
     }
 
+    //Requests details of individual book entry
     private fun getBookDetails(current: Book, imgResponse: ImageView, txtTitle: TextView) {
         val queue = Volley.newRequestQueue(this)
 

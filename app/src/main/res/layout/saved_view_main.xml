@@ -68,4 +68,15 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <Button
+        android:id="@+id/btnGenerateQRCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generate QR Code"
+        app:layout_constraintTop_toBottomOf="@+id/txt_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteX="123dp"
+        tools:layout_editor_absoluteY="667dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

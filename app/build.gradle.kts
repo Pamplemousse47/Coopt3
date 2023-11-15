@@ -44,6 +44,8 @@ android {
 
 dependencies {
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.google.zxing:core:3.4.0")
+    implementation ("com.journeyapps:zxing-android-embedded:4.1.0")
 
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.core:core-ktx:1.12.0")

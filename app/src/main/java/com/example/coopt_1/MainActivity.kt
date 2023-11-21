@@ -1,9 +1,9 @@
 package com.example.coopt_1
 
-//Import these items
-
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -16,15 +16,11 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.coopt_1.databinding.ActivityMainBinding
 import org.json.JSONArray
-import android.content.Intent
-import android.view.View
 import androidx.room.Room
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-
 class MainActivity : AppCompatActivity() {
-
     private lateinit var db: BookDatabase
 
     @SuppressLint("SetTextI18n")
